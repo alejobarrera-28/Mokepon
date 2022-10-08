@@ -79,7 +79,7 @@ app.post("/mokepon/:jugadorId/posicion", (req, res) => {
     })
 })
 
-app.post("/mokepon/:ataques", (req, res) => {
+app.post("/:jugadorId/ataques", (req, res) => {
     const jugadorId = req.params.jugadorId || ""
     const ataques = req.body.ataques || []
     
