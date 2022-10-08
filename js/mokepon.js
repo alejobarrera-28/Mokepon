@@ -173,9 +173,6 @@ function unirseAlJuego() {
 }
 
 function seleccionarMascotaJugador() {
-
-    sectionSeleccionarMascota.style.display = "none"
-   
     sectionVerMapa.style.display = "flex"   
     
     if (inputHipodoge.checked) {
@@ -189,8 +186,10 @@ function seleccionarMascotaJugador() {
         mascotaJugador = inputRatigueya.id
     }   else {
         alert("Selecciona una mascota")
+        return
     }   
-
+    sectionSeleccionarMascota.style.display = "none"
+    
     seleccionarMokepon(mascotaJugador)
 
     extraerAtaques(mascotaJugador)
@@ -272,6 +271,22 @@ function enviarAtaques() {
             ataques: ataqueJugador
         })
     })
+    intervalo = setInterval(obtenerAtaques, 50)
+}
+
+function obtenerAtaques() {
+    fetch(`http://localhost:8080/mokepon/${enemigoID}/ataques`)
+    .then(function (res) {
+        if (res.ok) {
+            res.json()
+            .then(function ({ ataques }) {
+                if (ataques.length === 5) {
+                    ataqueEnemigo = ataques
+                    combate()
+                }
+            }) 
+        }
+    })
 }
 
 function seleccionarMascotaEnemigo() {
@@ -307,6 +322,7 @@ function indexAmbosOponente(jugador, enemigo) {
 }
 
 function combate() {
+    clearInterval(intervalo)
 
     for (let index = 0; index < ataqueJugador.length; index++) {
         if(ataqueJugador [index] === ataqueEnemigo[index]) {
@@ -412,10 +428,10 @@ function enviarPosicion(x, y) {
         if(res.ok) {
             res.json()
                 .then(function ({ enemigos }) {
-                    console.log(enemigos);
-                    mokeponesEnemigos = enemigos.map(function (enemigo) {
+                    if (enemigos.length === 0) {console.log("todavia no hay enemigos")}
+                        mokeponesEnemigos = enemigos.map(function (enemigo) {
                         let mokeponEnemigo = null
-                        const mokeponNombre = enemigo.mokepon.nombre || ""
+                        const mokeponNombre = enemigo.mokepon.nombre || []
                         if (mokeponNombre === "Hipodoge") {
                             mokeponEnemigo = new Mokepon("Hipodoge", "./assets/mokepons_mokepon_hipodoge_attack.png", 5, "./assets/hipodoge.png", enemigo.id)
                         } else if (mokeponNombre === "Capipepo") {
